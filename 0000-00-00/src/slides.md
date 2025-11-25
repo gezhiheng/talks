@@ -555,7 +555,7 @@ Learn More: [Mermaid Diagrams](https://sli.dev/guide/features/mermaid) and [Plan
 ---
 foo: bar
 dragPos:
-  square: 691,32,167,_,-16
+  square: 567,60,167,_,-24
 ---
 
 # Draggable Elements

@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
-import prompts from 'prompts'
 import { execa } from 'execa'
+import prompts from 'prompts'
 
 async function startPicker(args: string[]) {
   const folders = (await fs.readdir(new URL('..', import.meta.url), { withFileTypes: true }))
@@ -14,13 +14,13 @@ async function startPicker(args: string[]) {
   const result = args.includes('-y')
     ? { folder: folders[0] }
     : await prompts([
-      {
-        type: 'select',
-        name: 'folder',
-        message: 'Pick a folder',
-        choices: folders.map(folder => ({ title: folder, value: folder })),
-      },
-    ])
+        {
+          type: 'select',
+          name: 'folder',
+          message: 'Pick a folder',
+          choices: folders.map(folder => ({ title: folder, value: folder })),
+        },
+      ])
 
   args = args.filter(arg => arg !== '-y')
 

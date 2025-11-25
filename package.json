@@ -10,6 +10,7 @@
     "export": "pnpm run picker export",
     "typecheck": "vue-tsc --noEmit",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "picker": "PICKER_EDITOR=code esno scripts/picker.ts",
     "prepare": "git submodule update --init --recursive"
   },
@@ -29,7 +30,6 @@
     "execa": "^9.5.2",
     "fast-glob": "^3.3.2",
     "markdown-it-magic-link": "^0.1.4",
-    "playwright-chromium": "^1.45.1",
     "pnpm": "^10.23.0",
     "prettier-plugin-slidev": "^1.0.5",
     "prompts": "^2.4.2",

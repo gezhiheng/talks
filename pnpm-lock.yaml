@@ -53,9 +53,6 @@ importers:
       markdown-it-magic-link:
         specifier: ^0.1.4
         version: 0.1.4
-      playwright-chromium:
-        specifier: ^1.45.1
-        version: 1.45.3
       pnpm:
         specifier: ^10.23.0
         version: 10.23.0
@@ -8070,8 +8067,10 @@ snapshots:
   playwright-chromium@1.45.3:
     dependencies:
       playwright-core: 1.45.3
+    optional: true
 
-  playwright-core@1.45.3: {}
+  playwright-core@1.45.3:
+    optional: true
 
   pluralize@8.0.0: {}
 
