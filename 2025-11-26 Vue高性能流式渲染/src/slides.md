@@ -2,7 +2,7 @@
 theme: seriph
 title: Vue高性能流式渲染
 info: |
-  分享主题：Vue 高性能流式渲染与 `vue-markdown-renderer`
+  分享主题：Vue 高性能流式渲染与 `markstream-vue`
 class: text-center
 transition: slide-left
 mdc: true
@@ -234,7 +234,7 @@ for await (const chunk of stream) {
     </div>
 
   <div class="mt-4 p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
-      <span v-mark.circle.orange="10">vue-markdown-renderer</span> 采用此策略
+      <span v-mark.circle.orange="10">markstream-vue</span> 采用此策略
     </div>
 
   </v-clicks>
@@ -242,13 +242,29 @@ for await (const chunk of stream) {
 
 ---
 
-# 库简介：vue-markdown-renderer
-
-
+# 库简介：markstream-vue
 
 ---
 
 # 快速上手
+
+```bash
+pnpm add markstream-vue
+```
+
+```vue {all|3-4|10|all}
+<script setup lang="ts">
+  import { ref } from 'vue'
+  import MarkdownRender from 'markstream-vue'
+  import 'markstream-vue/index.css'
+
+  const md = ref(`# Hello World\n\nThis is **bold** and this is *italic*.`)
+</script>
+
+<template>
+  <MarkdownRender :content="md" />
+</template>
+```
 
 ---
 layout: section
@@ -262,7 +278,7 @@ layout: section
 transition: slide-up
 ---
 
-# 深入 vue-markdown-renderer
+# 深入 markstream-vue
 
 ---
 layout: two-cols-header
@@ -392,7 +408,7 @@ class: text-center
 欢迎提问 · 也欢迎一起贡献！
 
 <div mt-4 text-sm opacity-60>
-GitHub: <a href="https://github.com/" target="_blank">vue-markdown-renderer</a>
+GitHub: <a href="https://github.com/" target="_blank">markstream-vue</a>
 </div>
 
 ---
