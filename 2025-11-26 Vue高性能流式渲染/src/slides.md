@@ -97,7 +97,7 @@ layout: center
 <!-- Presenter Notes: 强调一点：流式渲染不仅是“更快”，更重要是主观体验——用户感觉页面一直在工作，而不是在“卡”。 -->
 
 ---
-layout: center
+layout: section
 transition: slide-up
 ---
 # 几种「流式」模式对比
@@ -233,7 +233,7 @@ for await (const chunk of stream) {
       <span>按需加载组件</span>
     </div>
 
-  <div class="mt-4 p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
+  <div class="p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
       <span v-mark.circle.orange="10">markstream-vue</span> 采用此策略
     </div>
 
@@ -244,21 +244,57 @@ for await (const chunk of stream) {
 
 # 库简介：markstream-vue
 
+https://github.com/Simon-He95/markstream-vue
+
+<v-click>
+针对 Vue 3 的高性能、流式友好型 Markdown 渲染组件
+</v-click>
+
+<div class="flex flex-col items-center gap-8 mt-10">
+  <div class="grid grid-cols-3 gap-6 w-full max-w-5xl">
+  <v-clicks>
+    <div class="flex flex-col items-center p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/50 shadow-sm hover:scale-105 transition opacity-75">
+      <div class="i-carbon-chart-relationship text-4xl text-blue-500 mb-4" />
+      <h3 class="text-lg font-bold mb-2">渐进式 Mermaid</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 text-center">图表随内容流式加载</p>
+    </div>
+    <div class="flex flex-col items-center p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/50 shadow-sm hover:scale-105 transition opacity-75">
+      <div class="i-carbon-compare text-4xl text-purple-500 mb-4" />
+      <h3 class="text-lg font-bold mb-2">流式 Diff 代码块</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 text-center">智能代码变更，仅重绘修改行</p>
+    </div>
+    <div class="flex flex-col items-center p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/50 shadow-sm hover:scale-105 transition opacity-75">
+      <div class="i-carbon-flash text-4xl text-orange-500 mb-4" />
+      <h3 class="text-lg font-bold mb-2">大文档实时预览</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 text-center">延迟低至毫秒级</p>
+    </div>
+  </v-clicks>
+  </div>
+</div>
+
 ---
 
 # 快速上手
 
+<div>安装</div>
+
 ```bash
 pnpm add markstream-vue
+# 或
+npm install markstream-vue
+# 或
+yarn add markstream-vue
 ```
 
-```vue {all|3-4|10|all}
+<div>示例</div>
+
+```vue {all|3-4|6,10|all}
 <script setup lang="ts">
   import { ref } from 'vue'
   import MarkdownRender from 'markstream-vue'
   import 'markstream-vue/index.css'
 
-  const md = ref(`# Hello World\n\nThis is **bold** and this is *italic*.`)
+  const md = ref('# Hello World')
 </script>
 
 <template>
@@ -284,119 +320,191 @@ transition: slide-up
 layout: two-cols-header
 ---
 
-# 设计上的几个核心点
+# 渲染组件入口
 
-::left::
+```vue {all|7-8|9-11,16-21|all}
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { parseMarkdownToStructure } from 'stream-markdown-parser'
+import CodeBlockNodeAsync from './asyncComponent'
+import FallbackComponent from './FallbackComponent.vue'
 
-<v-clicks depth="2">
-<div>
-  <p class="text-lg font-semibold">增量 Tokenizer</p>
-  <ul class="mt-1 text-sm leading-tight">
-    <li>按 chunk 输入，无需等待完整字符串</li>
-    <li>保持语义块边界稳定，避免代码块 / 列表被截断</li>
-  </ul>
-</div>
+const props = defineProps<NodeRendererProps>()
+const parsedNodes = computed(() => props.content ? parseMarkdownToStructure(props.content) : [])
+function getNodeComponent(node) {
+  return node.type === 'code_block' ? CodeBlockNodeAsync : FallbackComponent
+}
+</script>
 
-<div>
-  <p class="text-lg font-semibold">Block 级渲染</p>
-  <ul class="mt-1 text-sm leading-tight">
-    <li>每个 Block 单独转为 Vue vnode / 组件</li>
-    <li>在 Block 内挂载插槽、动态组件，实现细粒度交互</li>
-  </ul>
-</div>
-
-<div>
-  <p class="text-lg font-semibold">可拓展处理链</p>
-  <ul class="mt-1 text-sm leading-tight">
-    <li>超链接、图片、表格等均可挂载自定义处理器</li>
-    <li>原生支持业务数据映射（如工单 ID → 内部系统链接）</li>
-  </ul>
-</div>
-</v-clicks>
-
-::right::
-
-<v-clicks depth="2">
-<div>
-  <p class="text-lg font-semibold">性能优先</p>
-  <ul class="mt-1 text-sm leading-tight">
-    <li>默认避免整体 innerHTML 替换，减少重排</li>
-    <li>针对长文与大量代码块预设轻量 Diff 路径</li>
-  </ul>
-</div>
-
-<div>
-  <p class="text-lg font-semibold">Vue 生态友好</p>
-  <ul class="mt-1 text-sm leading-tight">
-    <li>兼容 Composition API</li>
-    <li>无缝接入 Vue 3、Nuxt、VitePress 等框架</li>
-  </ul>
-</div>
-
-<div>
-  <p class="text-lg font-semibold">边缘环境兼容</p>
-  <ul class="mt-1 text-sm leading-tight">
-    <li>零 Node 内置模块依赖，支持 Workers 场景</li>
-    <li>解析逻辑可在 Cloudflare Workers 等边缘环境运行</li>
-  </ul>
-</div>
-</v-clicks>
-
----
-
-# 我的贡献 (Bug Fix PR)
-
-问题现象：大段代码块后紧接标题时，标题未被正确识别为新 Chunk，造成目录缺失。
-
-根因：Tokenizer 在处理三反引号结束符后未重置 `pendingHeading` 状态。
-
-修复要点：
-```diff
- if (inFenceEnd) {
-   flushFence()
--  // missing state reset
-+  resetHeadingLookahead()
- }
+<template>
+  <div class="markdown-renderer">
+    <component
+      v-for="node in parsedNodes"
+      :key="node.id"
+      :is="getNodeComponent(node)"
+      :node="node"
+    />
+  </div>
+</template>
 ```
 
-结果：目录生成稳定；增量模式下不会合并错误区段。并补充单测覆盖边界。
+<arrow v-click="[4,5]" x1="650" y1="410" x2="535" y2="250" color="rgba(95, 238, 13, 1)" width="2" arrowSize="1" />
+
+---
+layout: center
+transition: slide-up
+---
+
+# 解析AST
+
+```ts {all|2-3|5-7|9-10|all}
+export function parseMarkdownToStructure(markdown, md, options) {
+  // 使用 markdown-it-ts 将 markdown 字符串解析为token
+  const tokens = md.parse(markdown || '', {})
+
+  // 如果提供了预处理方法，则预先处理token
+  const pre = options.preTransformTokens
+  const transformedTokens = pre ? pre(tokens) : tokens
+
+  // 将令牌处理成AST
+  const result = processTokens(transformedTokens, options)
+
+  return result
+}
+```
+
+---
+layout: center
+---
+
+# 解析后的AST
+
+```json
+[
+  {
+    "type": "paragraph",
+    "content": "This is a paragraph."
+  },
+  {
+    "type": "code_block",
+    "language": "javascript",
+    "content": "console.log('Hello, world!');"
+  },
+  {
+    "type": "bullet_list",
+    "children": [
+      {
+        "type": "list_item",
+        "children": [
+          { "type": "paragraph", "content": "Item 1" }
+        ]
+      }
+    ]
+  }
+]
+```
 
 ---
 
-# 我的贡献 (文档改进 PR)
+# 性能优化策略
 
-- 增补“流式渲染 3 种 flush 策略”示例（首屏 / 固定大小 / Idle）
-- 修正文中对 SSR Hydration 顺序描述错误
-- 添加 FAQ：与现有 markdown-it 插件迁移步骤
+<div class="grid grid-cols-3 gap-6 mt-12 px-4">
+  <v-click>
+    <div class="flex flex-col items-center p-6 border border-green-500/20 rounded-xl bg-green-500/5 shadow-sm hover:scale-105 transition duration-300">
+      <div class="i-carbon-layers text-5xl text-green-500 mb-6" />
+      <h3 class="text-xl font-bold mb-3">批量渲染</h3>
+      <p class="text-sm opacity-75 text-center leading-relaxed">
+        合并高频微小更新<br/>减少 DOM Patch 频次<br/>避免主线程抖动
+      </p>
+    </div>
+  </v-click>
 
-前后对比：
+  <v-click>
+    <div class="flex flex-col items-center p-6 border border-blue-500/20 rounded-xl bg-blue-500/5 shadow-sm hover:scale-105 transition duration-300">
+      <div class="i-carbon-view text-5xl text-blue-500 mb-6" />
+      <h3 class="text-xl font-bold mb-3">视口懒加载</h3>
+      <p class="text-sm opacity-75 text-center leading-relaxed">
+        IntersectionObserver 监控<br/>仅渲染可见区域组件<br/>大幅降低首屏内存
+      </p>
+    </div>
+  </v-click>
 
-| 条目 | 之前 | 之后 |
-| ---- | ---- | ---- |
-| Streaming 示例 | 无 | 三种策略表格 + 代码 |
-| SSR 部分 | Hydration 时机不清晰 | 明确“脚本延迟 + 目录二次构建” |
-| 插件迁移 | 简略一行 | 分步指南 (适配层、测试) |
+  <v-click>
+    <div class="flex flex-col items-center p-6 border border-purple-500/20 rounded-xl bg-purple-500/5 shadow-sm hover:scale-105 transition duration-300">
+      <div class="i-carbon-machine-learning-model text-5xl text-purple-500 mb-6" />
+      <h3 class="text-xl font-bold mb-3">WebWorker 并行</h3>
+      <p class="text-sm opacity-75 text-center leading-relaxed">
+        数学公式 / Mermaid 图表<br/>移至后台线程计算<br/>保持 UI 交互流畅
+      </p>
+    </div>
+  </v-click>
+</div>
 
 ---
 
-# 经验总结
+# 我的贡献
 
-- 数据驱动：先量化指标再定优化优先级
-- Flush 粒度：过细 => Diff 频繁；过粗 => 首屏慢
-- 并行不是银弹：主线程交互与 Worker 传输成本需权衡
-- 插件桥接：保持与 markdown-it 生态兼容可以降低迁移成本
-- 文档清晰度直接影响采纳速度
+<div class="flex flex-col gap-4 mt-6 max-w-2xl mx-auto">
+  <v-click>
+    <a
+      v-motion
+      :initial="{ opacity: 0, y: 50, scale: 0.95 }"
+      :enter="{ opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 20 } }"
+      href="https://github.com/Simon-He95/markstream-vue/pull/141" target="_blank" class="block bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow no-underline">
+      <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
+        <div class="i-carbon-logo-github" />
+        <span>Simon-He95/markstream-vue</span>
+        <span class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold">Merged</span>
+      </div>
+      <div class="text-base font-bold text-gray-800 dark:text-gray-200">
+        fix(strong-link-parser): token错误拆分
+      </div>
+      <div class="text-xs text-gray-400 mt-2">
+        #141 opened by gezhiheng
+      </div>
+    </a>
+  </v-click>
 
----
+  <v-click>
+    <a
+      v-motion
+      :initial="{ opacity: 0, y: 50, scale: 0.95 }"
+      :enter="{ opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 20 } }"
+      href="https://github.com/Simon-He95/markstream-vue/pull/142" target="_blank" class="block bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow no-underline">
+      <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
+        <div class="i-carbon-logo-github" />
+        <span>Simon-He95/markstream-vue</span>
+        <span class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold">Merged</span>
+      </div>
+      <div class="text-base font-bold text-gray-800 dark:text-gray-200">
+        chore(docs): fix index.md links & remove vitepress cache
+      </div>
+      <div class="text-xs text-gray-400 mt-2">
+        #142 opened by gezhiheng
+      </div>
+    </a>
+  </v-click>
 
-# Roadmap / 展望
-
-- WebWorker 预解析稳定化 & 回退策略
-- 浏览器端缓存 Token 片段 (IndexedDB)
-- AST 片段签名用于重复段落去重
-- 更丰富的指令：`v-progress`, `v-outline-sync`
-- Edge 平台适配：Cloudflare Durable Objects 协同 streaming
-- 插件迁移工具：自动生成适配层模板
+  <v-click>
+    <a
+      v-motion
+      :initial="{ opacity: 0, y: 50, scale: 0.95 }"
+      :enter="{ opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 20 } }"
+      href="https://github.com/Simon-He95/markstream-vue/pull/135" target="_blank" class="block bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow no-underline">
+      <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
+        <div class="i-carbon-logo-github" />
+        <span>Simon-He95/markstream-vue</span>
+        <span class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold">Merged</span>
+      </div>
+      <div class="text-base font-bold text-gray-800 dark:text-gray-200">
+        chore(playground): switch to ESM for Tailwind config
+      </div>
+      <div class="text-xs text-gray-400 mt-2">
+        #135 opened by gezhiheng
+      </div>
+    </a>
+  </v-click>
+</div>
 
 ---
 layout: center
@@ -408,7 +516,7 @@ class: text-center
 欢迎提问 · 也欢迎一起贡献！
 
 <div mt-4 text-sm opacity-60>
-GitHub: <a href="https://github.com/" target="_blank">markstream-vue</a>
+GitHub: <a href="https://github.com/Simon-He95/markstream-vue" target="_blank">markstream-vue</a>
 </div>
 
 ---
