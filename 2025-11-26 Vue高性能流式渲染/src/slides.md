@@ -242,7 +242,37 @@ for await (const chunk of stream) {
 
 ---
 
-# 库简介：markstream-vue
+# 业务痛点
+
+<div class="relative h-[450px] w-full flex justify-center items-center mt-8">
+  <v-click>
+    <img
+      src="./issue1.png"
+      class="absolute w-[700px] rounded-xl shadow-2xl border border-gray-400/20 bg-white dark:bg-gray-900 transition-all duration-500 hover:scale-105 hover:z-50"
+      style="transform: rotate(-4deg) translateY(-55px); z-index: 1;"
+    />
+  </v-click>
+
+  <v-click>
+    <img
+      src="./issue2.png"
+      class="absolute w-[700px] rounded-xl shadow-2xl border border-gray-400/20 bg-white dark:bg-gray-900 transition-all duration-500 hover:scale-105 hover:z-50"
+      style="transform: rotate(3deg) translateY(-30px); z-index: 2;"
+    />
+  </v-click>
+
+  <v-click>
+    <img
+      src="./issue3.png"
+      class="absolute w-[700px] rounded-xl shadow-2xl border border-gray-400/20 bg-white dark:bg-gray-900 transition-all duration-500 hover:scale-105 hover:z-50"
+      style="transform: rotate(-2deg) translateY(-30px); z-index: 3;"
+    />
+  </v-click>
+</div>
+
+---
+
+# markstream-vue
 
 https://github.com/Simon-He95/markstream-vue
 
@@ -254,11 +284,6 @@ https://github.com/Simon-He95/markstream-vue
   <div class="grid grid-cols-3 gap-6 w-full max-w-5xl">
   <v-clicks>
     <div class="flex flex-col items-center p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/50 shadow-sm hover:scale-105 transition opacity-75">
-      <div class="i-carbon-chart-relationship text-4xl text-blue-500 mb-4" />
-      <h3 class="text-lg font-bold mb-2">渐进式 Mermaid</h3>
-      <p class="text-sm text-gray-500 dark:text-gray-400 text-center">图表随内容流式加载</p>
-    </div>
-    <div class="flex flex-col items-center p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/50 shadow-sm hover:scale-105 transition opacity-75">
       <div class="i-carbon-compare text-4xl text-purple-500 mb-4" />
       <h3 class="text-lg font-bold mb-2">流式 Diff 代码块</h3>
       <p class="text-sm text-gray-500 dark:text-gray-400 text-center">智能代码变更，仅重绘修改行</p>
@@ -267,6 +292,11 @@ https://github.com/Simon-He95/markstream-vue
       <div class="i-carbon-flash text-4xl text-orange-500 mb-4" />
       <h3 class="text-lg font-bold mb-2">大文档实时预览</h3>
       <p class="text-sm text-gray-500 dark:text-gray-400 text-center">延迟低至毫秒级</p>
+    </div>
+    <div class="flex flex-col items-center p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/50 shadow-sm hover:scale-105 transition opacity-75">
+      <div class="i-carbon-chart-relationship text-4xl text-blue-500 mb-4" />
+      <h3 class="text-lg font-bold mb-2">渐进式 Mermaid</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 text-center">图表随内容流式加载</p>
     </div>
   </v-clicks>
   </div>
@@ -308,6 +338,12 @@ transition: slide-up
 ---
 
 # 演示 Demo...
+
+---
+layout: iframe
+
+url: http://localhost:3333/test
+---
 
 ---
 layout: section
@@ -359,14 +395,14 @@ transition: slide-up
 
 ```ts {all|2-3|5-7|9-10|all}
 export function parseMarkdownToStructure(markdown, md, options) {
-  // 使用 markdown-it-ts 将 markdown 字符串解析为token
+  // 使用 markdown-it-ts 将 markdown 字符串解析为tokens
   const tokens = md.parse(markdown || '', {})
 
   // 如果提供了预处理方法，则预先处理token
   const pre = options.preTransformTokens
   const transformedTokens = pre ? pre(tokens) : tokens
 
-  // 将令牌处理成AST
+  // 将tokens处理成AST
   const result = processTokens(transformedTokens, options)
 
   return result
