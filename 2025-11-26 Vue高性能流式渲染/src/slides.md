@@ -15,7 +15,7 @@ drawings:
 更快、更稳、更流畅的 Markdown 流式输出
 
 <div class="absolute bottom-4 right-4 text-sm opacity-50">
-  Presenter: Henry Ge
+  分享人: 葛智恒
 </div>
 
 <!-- Presenter Notes:
